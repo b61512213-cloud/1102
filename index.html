@@ -280,7 +280,7 @@
                 <!-- حقل الاسم -->
                 <div>
                     <label class="block text-xs font-bold text-neutral-400 mb-1.5 flex items-center gap-1.5">
-                        <i class="fa-solid fa-user text-brand-gold text-[10px]"></i> الاسم الكامل <span class="text-red-500">*</span>
+                        <i class="fa-solid fa-user text-brand-gold text-[10px]"></i> الاسم الكامل <span class="text-neutral-500">(اختياري)</span>
                     </label>
                     <input type="text" id="cust-name" placeholder="مثال: علي محمد" class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent text-white text-sm transition-all">
                 </div>
@@ -288,7 +288,7 @@
                 <!-- حقل رقم الهاتف -->
                 <div>
                     <label class="block text-xs font-bold text-neutral-400 mb-1.5 flex items-center gap-1.5">
-                        <i class="fa-solid fa-phone text-brand-gold text-[10px]"></i> رقم الهاتف للتأكيد <span class="text-red-500">*</span>
+                        <i class="fa-solid fa-phone text-brand-gold text-[10px]"></i> رقم الهاتف للتأكيد <span class="text-neutral-500">(اختياري)</span>
                     </label>
                     <input type="tel" id="cust-phone" placeholder="مثال: 077xxxxxxxx" class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent text-white text-sm text-left transition-all" dir="ltr">
                 </div>
@@ -301,12 +301,12 @@
                     <input type="text" id="cust-address" placeholder="مثال: الكرادة / قرب ساحة كهرمانة" class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent text-white text-sm transition-all">
                 </div>
 
-                <!-- حقل أقرب نقطة دالة -->
+                <!-- حقل تفاصيل العنوان -->
                 <div>
                     <label class="block text-xs font-bold text-neutral-400 mb-1.5 flex items-center gap-1.5">
-                        <i class="fa-solid fa-building-circle-check text-brand-gold text-[10px]"></i> أقرب نقطة دالة <span class="text-neutral-500">(اختياري)</span>
+                        <i class="fa-solid fa-building-circle-check text-brand-gold text-[10px]"></i> تفاصيل العنوان (المحلة، الزقاق، الدار أو نقطة دالة) <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="cust-landmark" placeholder="مثال: مقابل صيدلية الهلال أو الأسواق الفلانية" class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent text-white text-sm transition-all">
+                    <input type="text" id="cust-landmark" placeholder="مثال: محلة 901، زقاق 12، دار 5 / مقابل صيدلية الهلال" class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent text-white text-sm transition-all">
                 </div>
             </div>
             
@@ -1123,7 +1123,7 @@
             openAddressModal();
         }
 
-        // التحقق من الحقول الإلزامية وإرسال الفاتورة مع معلومات العنوان عبر الواتساب
+        // التحقق من الحقول وإرسال الفاتورة مع العنوان الإجباري
         function submitOrderAndSend() {
             const name = document.getElementById('cust-name').value.trim();
             const phone = document.getElementById('cust-phone').value.trim();
@@ -1132,21 +1132,11 @@
 
             let hasError = false;
 
-            // التحقق من الحقول وتلوين حدود الحقل الفارغ باللون الأحمر للحماية والتنبيه البصري الفاخر
-            if (!name) {
-                document.getElementById('cust-name').classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                hasError = true;
-            } else {
-                document.getElementById('cust-name').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
-            }
+            // الاسم ورقم الهاتف اختياريان، لذلك نزيل أي تظليل أحمر سابق
+            document.getElementById('cust-name').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+            document.getElementById('cust-phone').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
 
-            if (!phone) {
-                document.getElementById('cust-phone').classList.add('border-red-500', 'ring-1', 'ring-red-500');
-                hasError = true;
-            } else {
-                document.getElementById('cust-phone').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
-            }
-
+            // التحقق من حقل العنوان (مطلوب)
             if (!address) {
                 document.getElementById('cust-address').classList.add('border-red-500', 'ring-1', 'ring-red-500');
                 hasError = true;
@@ -1154,22 +1144,35 @@
                 document.getElementById('cust-address').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
             }
 
+            // التحقق من تفاصيل العنوان (مطلوب)
+            if (!landmark) {
+                document.getElementById('cust-landmark').classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                hasError = true;
+            } else {
+                document.getElementById('cust-landmark').classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+            }
+
             if (hasError) {
-                // إرجاع دون المتابعة في حال وجود حقل فارغ
+                // إرجاع دون المتابعة في حال وجود حقل إجباري فارغ
                 return;
             }
 
-            // البدء في صياغة رسالة الواتساب الأنيقة والموثوقة
+            // صياغة رسالة الواتساب الاحترافية والمعدلة
             let total = 0;
             let msg = `*السلام عليكم ورحمة الله وبركاته* 🌟\n\n`;
             msg += `طلب جديد من *مطعم 110*:\n`;
             msg += `━━━━━━━━━━━━━━━━━\n`;
-            msg += `👤 *الاسم:* ${name}\n`;
-            msg += `📞 *الهاتف:* ${phone}\n`;
-            msg += `📍 *العنوان:* ${address}\n`;
-            if (landmark) {
-                msg += `🏢 *أقرب نقطة دالة:* ${landmark}\n`;
+            
+            // إضافة الاسم والهاتف فقط في حال تمت كتابتهما
+            if (name) {
+                msg += `👤 *الاسم:* ${name}\n`;
             }
+            if (phone) {
+                msg += `📞 *الهاتف:* ${phone}\n`;
+            }
+            
+            msg += `📍 *العنوان:* ${address}\n`;
+            msg += `🏢 *تفاصيل العنوان:* ${landmark}\n`;
             msg += `━━━━━━━━━━━━━━━━━\n`;
             msg += `📦 *تفاصيل الطلب:*\n`;
             
@@ -1186,7 +1189,7 @@
             const whatsappNumber = "9647715170081";
             window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(msg), '_blank');
             
-            // إغلاق المودال وتصفير القيم
+            // إغلاق المودال
             closeAddressModal();
         }
 
